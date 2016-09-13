@@ -69,5 +69,5 @@ public abstract class Command {
     /*
      * Returns true if command type mutates the data
      */
-    abstract boolean isMutating();
+    public abstract boolean isMutating();
 }
