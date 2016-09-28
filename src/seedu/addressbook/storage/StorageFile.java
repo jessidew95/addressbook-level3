@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 /**
  * Represents the file used to store address book data.
  */
-public class StorageFile {
+public class StorageFile implements Storage{
 
     /** Default file path used if the user doesn't provide the file name. */
     public static final String DEFAULT_STORAGE_FILEPATH = "addressbook.txt";
@@ -23,25 +23,6 @@ public class StorageFile {
     /* Note: Note the use of nested classes below.
      * More info https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html
      */
-
-    /**
-     * Signals that the given file path does not fulfill the storage filepath constraints.
-     */
-    public static class InvalidStorageFilePathException extends IllegalValueException {
-        public InvalidStorageFilePathException(String message) {
-            super(message);
-        }
-    }
-
-    /**
-     * Signals that some error has occured while trying to convert and read/write data between the application
-     * and the storage file.
-     */
-    public static class StorageOperationException extends Exception {
-        public StorageOperationException(String message) {
-            super(message);
-        }
-    }
 
     private final JAXBContext jaxbContext;
 
@@ -78,18 +59,19 @@ public class StorageFile {
         return filePath.toString().endsWith(".txt");
     }
 
-    /**
-     * Saves all data to this storage file.
-     *
-     * @throws StorageOperationException if there were errors converting and/or storing data to file.
-     */
-    public void save(AddressBook addressBook) throws StorageOperationException {
+	/**
+	 * Saves all data to this storage file.
+	 *
+	 * @throws StorageOperationException
+	 *             if there were errors converting and/or storing data to file.
+	 */
+	public void save(AddressBook addressBook) throws StorageOperationException {
 
         /* Note: Note the 'try with resource' statement below.
          * More info: https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
          */
         try (final Writer fileWriter =
-                     new BufferedWriter(new FileWriter(path.toFile()))) {
+            new BufferedWriter(new FileWriter(path.toFile()))) {
 
             final AdaptedAddressBook toSave = new AdaptedAddressBook(addressBook);
             final Marshaller marshaller = jaxbContext.createMarshaller();
@@ -143,6 +125,10 @@ public class StorageFile {
 
     public String getPath() {
         return path.toString();
+    }
+    
+    public Storage initialize() throws InvalidStorageFilePathException{
+    	return new StorageFile();
     }
 
 }
